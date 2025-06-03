@@ -1,12 +1,20 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useNavigate,useLocation} from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom'; // useLocation 추가!
+import { useSignUp } from '../styles/SignupContext'; // Context import
+import StyledRemoteImage from '../styles/RemoteImage'; // RemoteImage import
+import { LogoButton } from '../styles/CommonButtons'; // 로고 버튼 import
 
 const CheckArea = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const name = location.state?.name || ''; // 이전 페이지에서 넘어온 이름
-  const [region, setRegion] = useState('');
+  const location = useLocation(); // ← 추가!
+  const { signUpData, updateSignUpData } = useSignUp();
+
+  // PhoneNumberPage에서 받은 isProfileComplete 값 받기
+  const isProfileComplete = location.state?.isProfileComplete;
+
+  // 기존 값 있으면 불러오기 (뒤로 갔다 와도 유지)
+  const [region, setRegion] = useState(signUpData.region || '');
 
   const regions = [
     '서울', '부산', '대구', '인천', '광주', '대전', '울산',
@@ -14,28 +22,39 @@ const CheckArea = () => {
     '전남', '경북', '경남', '제주'
   ];
 
+  const handleNext = () => {
+    if (!region) {
+      alert('지역을 선택해주세요!');
+      return;
+    }
+    updateSignUpData({ region });
+    // LoginComplete 페이지로 isProfileComplete 값도 함께 넘김
+    navigate('/LoginComplete', { state: { isProfileComplete } });
+  };
+
   return (
     <Wrapper>
       <Container>
-        <LogoutButton onClick={() => navigate('/')}>로고</LogoutButton>
-
+        <LogoButton onClick={() => navigate('/Welcome')}>
+          <StyledRemoteImage imageKey="Logo_0" alt="로고" />
+        </LogoButton>
         <ImageBox>
-          <p>캐릭터 이미지</p>
+          <StyledRemoteImage imageKey="CheckAreaCharacter_0" alt="캐릭터" />
         </ImageBox>
-        <QuestionText>거주하고 계신 지역을 <br></br>선택해주세요!</QuestionText>
-        <Select value={region} onChange={(e) => setRegion(e.target.value)}>
+        <QuestionText>
+          거주하고 계신 지역을 <br />
+          선택해주세요!
+        </QuestionText>
+        <Select value={region} onChange={e => setRegion(e.target.value)}>
           <option value="">선택해주세요</option>
-          {regions.map((region) => (
+          {regions.map(region => (
             <option key={region} value={region}>{region}</option>
           ))}
         </Select>
-
         <ButtonGroup>
-          <NavButton onClick={() => navigate(-1)}>이전으로</NavButton>
-          <NavButton onClick={() =>
-            navigate('/LoginComplete', { state: { name } })}>
-            다음으로
-          </NavButton>
+          {/* 이전 페이지로도 isProfileComplete 넘겨주고 싶다면 아래처럼! */}
+          <NavButton onClick={() => navigate(-1, { state: { isProfileComplete } })}>이전으로</NavButton>
+          <NavButton onClick={handleNext}>다음으로</NavButton>
         </ButtonGroup>
       </Container>
     </Wrapper>
@@ -44,6 +63,7 @@ const CheckArea = () => {
 
 export default CheckArea;
 
+// ===== styled-components =====
 const Wrapper = styled.div`
   width: 100%;
   height: 100vh;
@@ -67,7 +87,6 @@ const Container = styled.div`
   padding: 20px;
 `;
 
-
 const LogoutButton = styled.button`
   position: absolute;
   top: 20px;
@@ -81,10 +100,10 @@ const LogoutButton = styled.button`
 
 const ImageBox = styled.div`
   width: 100%;
-  max-width: 300px;
-  height: 300px;
-  background-color: #eee;
-  border: 1px solid #ccc;
+max-width: 219px;
+  height: 40%;
+  
+ padding-bottom:10px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -92,33 +111,43 @@ const ImageBox = styled.div`
 `;
 
 const QuestionText = styled.p`
-  font-size: 18px;
+  font-size: 20px;
   font-weight: bold;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 50px;
   line-height: 1.5;
+  margin-bottom: 100px;
 `;
-
 
 const Select = styled.select`
   padding: 10px 16px;
-  font-size: 16px;
+  font-size: 20px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  margin-bottom: 20px;
+
 `;
 
 const ButtonGroup = styled.div`
-  display: flex;
+   display: flex;
+   justify-content: center;
+  gap: 22px;
   width: 100%;
-  gap: 16px;
+  margin-top: 32px;
 `;
 
 const NavButton = styled.button`
-  flex: 1;
-  padding: 12px;
-  font-size: 18px;
+display: flex;
+  justify-content: center;
+  width: 100%;
+  gap: 16px;
+  
+  background: rgba(120, 120, 128, 0.2);
+  width: 200px;
   border: 1px solid #000;
-  background-color: white;
-  border-radius: 4px;
+  padding: 15px 0;
+  font-size: 20px;
+  border-radius: 10px;
   cursor: pointer;
+  
 `;

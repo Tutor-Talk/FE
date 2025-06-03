@@ -1,31 +1,52 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useSignUp } from '../styles/SignupContext';
+import { LogoButton } from '../styles/CommonButtons';
+import StyledRemoteImage from '../styles/RemoteImage';
 
 function CheckName() {
   const navigate = useNavigate();
-  const [name, setName] = useState('');
+  const location = useLocation();
+  const { signUpData, updateSignUpData } = useSignUp();
+  const isProfileComplete = location.state?.isProfileComplete;
+  const [name, setName] = useState(signUpData.name || '');
+  const [error, setError] = useState('');
+
+  const handleNext = () => {
+    if (!name.trim()) {
+      setError('이름을 입력해주세요.');
+      return;
+    }
+    setError('');
+    updateSignUpData({ name });
+    navigate('/Birthday', { state: { isProfileComplete } });
+  };
+
+  const handleInputChange = (e) => {
+    setName(e.target.value);
+    if (e.target.value.trim()) setError('');
+  };
 
   return (
     <Wrapper>
       <Container>
-        <LogoutButton onClick={() => navigate('/')}>로고</LogoutButton>
-
+        <LogoButton onClick={() => navigate('/Welcome')}>
+          <StyledRemoteImage imageKey="Logo_0" alt="로고" />
+        </LogoButton>
         <ImageBox>
-          <p>캐릭터 이미지</p>
+          <StyledRemoteImage imageKey="CheckNameCharacter_0" alt="캐릭터" />
         </ImageBox>
-
         <WelcomeText>성함을 입력해주세요!</WelcomeText>
-
         <Input
           type="text"
+          placeholder=""
           value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="예) 홍길동"
+          onChange={handleInputChange}
         />
         <NameHint>예) 홍길동</NameHint>
-
-        <NextButton onClick={() => navigate('/Email', { state: { name } })}>
+        {error && <ErrorMessage>{error}</ErrorMessage>}
+        <NextButton onClick={handleNext}>
           다음으로 넘어가기
         </NextButton>
       </Container>
@@ -35,12 +56,11 @@ function CheckName() {
 
 export default CheckName;
 
-
+// ---- styled-components 등 아래 코드 동일 ----
 
 const Wrapper = styled.div`
-  height: 100%;
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
   background-color: #f9f9f9;
   display: flex;
   justify-content: center;
@@ -52,55 +72,46 @@ const Wrapper = styled.div`
 const Container = styled.div`
   height: 100%;
   width: 100%;
-  max-width: 464px; 
-  padding: 20px;
+  max-width: 464px;
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0,0,0,0.05);
-  text-align: center;
+  padding: 20px;
   position: relative;
-`;
-
-const LogoutButton = styled.button`
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  padding: 6px 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: white;
-  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const ImageBox = styled.div`
   width: 100%;
-  max-width: 300px;
-  height: 300px;
+  max-width: 219px;
+  height: 40%;
   background-color: #eee;
   margin: 100px auto 20px;
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 1px solid #ccc;
 `;
 
 const WelcomeText = styled.p`
-  font-size: 18px;
+  font-size: 20px;
   font-weight: bold;
-  margin: 20px 0;
+  margin-bottom: 80px;
   line-height: 1.5;
 `;
 
 const Input = styled.input`
   width: 100%;
-  background-color: #f2f2f2;
-  border: none;
-  padding: 12px;
-  font-size: 18px;
-  margin-bottom: 16px;
-  border-radius: 4px;
+  background-color: #F2F2F7;
+  padding: 15px;
+  font-size: 20px;
+  margin-bottom: 22px;
+  border-radius: 40px;
   box-sizing: border-box;
+  border: 2px solid #C7C7CC;
 `;
+
 const NameHint = styled.div`
   display: flex;
   align-self: flex-start;
@@ -108,14 +119,30 @@ const NameHint = styled.div`
   color: #aaa;
   margin-top: -12px;
   margin-bottom: 20px;
+  margin-left:5px;
+`;
+
+const ErrorMessage = styled.div`
+  color: #ff3267;
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 16px;
+  align-self: flex-start;
+  margin-left: 5px;
 `;
 
 const NextButton = styled.button`
-  padding: 12px;
-  font-size: 18px;
-  background-color: white;
-  border: 1px solid black;
+  display: flex;
+  justify-content: center;
   width: 100%;
-  border-radius: 4px;
+  gap: 16px;
+  margin-top: 12px;
+  background: rgba(120, 120, 128, 0.2);
+  width: 200px;
+  border: 1px solid #000;
+  padding: 15px 0;
+  font-size: 20px;
+  border-radius: 10px;
   cursor: pointer;
+  margin: 3px;
 `;

@@ -1,28 +1,37 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import { FcGoogle } from "react-icons/fc";
+import StyledRemoteImage from '../styles/RemoteImage';
+import { LogoButton } from '../styles/CommonButtons';
 
 function WelcomePage() {
   const navigate = useNavigate();
+  const GOOGLE_OAUTH_URL = "https://knowhow.it.com/oauth2/authorization/google";
+
+  const handleGoogleLogin = () => {
+    window.location.href = GOOGLE_OAUTH_URL;
+  };
+
   return (
     <Wrapper>
       <Container>
-        <LogoutButton onClick={() => navigate('/')}>로고</LogoutButton>
-
+        <LogoButton onClick={() => navigate('/')}>
+          <StyledRemoteImage imageKey="Logo_0" alt="로고" />
+        </LogoButton>
         <ImageBox>
-          <p>캐릭터 이미지</p>
+          <StyledRemoteImage imageKey="WelcomePageCharacter_0" alt="캐릭터" />
         </ImageBox>
-
         <WelcomeText>
-          안녕하세요! 튜터톡에 오신 걸을 환영합니다🥲<br />
-          당신의 이름을 알려주세요!
+          안녕하세요! 노하우에 오신것을 환영합니다!
         </WelcomeText>
-
-        <Input type="text" placeholder="예) 홍길동" />
-
-        <DisabledButton onClick={() => navigate('/MainLogin')}>이미 계정이 있어요.</DisabledButton>
-        <NextButton onClick={() => navigate('/Name')}>다음으로 넘어가기
-        </NextButton>
+        <LoginButton onClick={() => navigate('/MainLogin')}>로그인</LoginButton>
+        <NextButton onClick={() => navigate('/Email')}>회원가입</NextButton>
+        <Divider />
+        <GoogleButton onClick={handleGoogleLogin}>
+          <FcGoogle size={26} />
+          Google 계정으로 로그인
+        </GoogleButton>
       </Container>
     </Wrapper>
   );
@@ -30,88 +39,139 @@ function WelcomePage() {
 
 export default WelcomePage;
 
+// ----------- styled-components -----------
 
 const Wrapper = styled.div`
-  height: 100%;
-  width: 100%;
+  width: 100vw;
+  height: 100vh;
   min-height: 100vh;
   background-color: #f9f9f9;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
   box-sizing: border-box;
+  padding: 0;
+  overflow: hidden; // 스크롤바 제거
+
+  @media (max-width: 600px) {
+    height: 100dvh; // 모바일 브라우저 대응
+    min-height: 100dvh;
+    padding: 0;
+  }
 `;
 
 const Container = styled.div`
   height: 100%;
   width: 100%;
-  max-width: 464px; 
-  padding: 20px;
+  max-width: 464px;
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0,0,0,0.05);
   text-align: center;
   position: relative;
-`;
+  padding: 20px;
+  margin: auto 0;  // 상하 중앙정렬, flex의 align-items: center와 같이 쓰면 최적화
 
-const LogoutButton = styled.button`
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  padding: 6px 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: white;
-  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; // 세로 중앙 배치
+
+  @media (max-width: 600px) {
+    max-width: 100vw;
+    border-radius: 0;
+    min-height: 100dvh;
+    padding: 10vw 4vw 8vw 4vw;
+  }
 `;
 
 const ImageBox = styled.div`
   width: 100%;
-  max-width: 300px;
-  height: 300px;
-  background-color: #eee;
-  margin: 100px auto 20px;
+  max-width: 216px;
+  height: 30%;
+  object-fit: cover;
+  clip-path: inset(0px 0.9px 1px 0px);
+  margin: 16px auto 16px;
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 1px solid #ccc;
+
+  @media (max-width: 600px) {
+    max-width: 60vw;
+    height: 38vw;
+    min-height: 130px;
+    margin: 24px auto 8px;
+  }
 `;
 
 const WelcomeText = styled.p`
   font-size: 18px;
   font-weight: bold;
-  margin: 20px 0;
+  margin: 18px 0 20px 0;
   line-height: 1.5;
+  @media (max-width: 600px) {
+    font-size: 16px;
+    margin: 16px 0 12px 0;
+  }
 `;
 
-const Input = styled.input`
-  width: 100%;
-  padding: 12px;
-  font-size: 18px;
-  margin-bottom: 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-`;
-
-const DisabledButton = styled.button`
-  background-color: #eee;
-  border: 1px solid #ccc;
-  color: #888;
-  padding: 10px;
-  margin-bottom: 20px;
-  width: 100%;
-  border-radius: 4px;
+const LoginButton = styled.button`
+  width: 338px;
+  height: 72px;
+  margin: 0 auto 14px auto;
+  background: #ff69b4;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-size: 20px;
+  font-weight: 500;
   cursor: pointer;
+  transition: 0.1s;
+  &:hover {
+    opacity: 0.92;
+  }
+  @media (max-width: 600px) {
+    width: 80vw;
+    max-width: 320px;
+    font-size: 17px;
+    height: 44px;
+  }
 `;
 
-const NextButton = styled.button`
-  padding: 12px;
+const NextButton = styled(LoginButton)`
+  background: #ff69b4;
+`;
+
+const Divider = styled.hr`
+  width: 56%;
+  margin: 26px auto 22px auto;
+  border: 0;
+  border-top: 2px solid #eee;
+`;
+
+const GoogleButton = styled.button`
+  width: 338px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 2px solid #222;
+  border-radius: 10px;
   font-size: 18px;
-  background-color: white;
-  border: 1px solid black;
-  width: 100%;
-  border-radius: 4px;
+  font-weight: 500;
+  color: #222;
   cursor: pointer;
+  transition: 0.1s;
+  gap: 10px;
+  margin: 0 auto;
+  &:hover {
+    background: #f5f5f5;
+  }
+  @media (max-width: 600px) {
+    width: 82vw;
+    max-width: 320px;
+    font-size: 16px;
+    height: 40px;
+  }
 `;
